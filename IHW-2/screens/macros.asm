@@ -1,70 +1,70 @@
 # =========================
-# macros.asm — макросы для RARS (RISC-V)
-# Назначение: единый I/O для int/double/строк + служебные обёртки.
-# Важно: без локальных числовых меток внутри .macro (совместимо с RARS).
+# macros.asm вЂ” РјР°РєСЂРѕСЃС‹ РґР»СЏ RARS (RISC-V)
+# РќР°Р·РЅР°С‡РµРЅРёРµ: РµРґРёРЅС‹Р№ I/O РґР»СЏ int/double/СЃС‚СЂРѕРє + СЃР»СѓР¶РµР±РЅС‹Рµ РѕР±С‘СЂС‚РєРё.
+# Р’Р°Р¶РЅРѕ: Р±РµР· Р»РѕРєР°Р»СЊРЅС‹С… С‡РёСЃР»РѕРІС‹С… РјРµС‚РѕРє РІРЅСѓС‚СЂРё .macro (СЃРѕРІРјРµСЃС‚РёРјРѕ СЃ RARS).
 # =========================
 
-# Печать null-terminated строки по МЕТКЕ в .data
+# РџРµС‡Р°С‚СЊ null-terminated СЃС‚СЂРѕРєРё РїРѕ РњР•РўРљР• РІ .data
 .macro print_label (%lbl)
     la a0, %lbl
     li a7, 4          # print_string
     ecall
 .end_macro
 
-# Печать одиночного символа (ASCII код в аргументе)
+# РџРµС‡Р°С‚СЊ РѕРґРёРЅРѕС‡РЅРѕРіРѕ СЃРёРјРІРѕР»Р° (ASCII РєРѕРґ РІ Р°СЂРіСѓРјРµРЅС‚Рµ)
 .macro print_char (%ch)
     li a0, %ch
     li a7, 11         # print_char
     ecall
 .end_macro
 
-# Перевод строки
+# РџРµСЂРµРІРѕРґ СЃС‚СЂРѕРєРё
 .macro newline
     li a0, 10         # '\n'
     li a7, 11
     ecall
 .end_macro
 
-# Печать int из произвольного регистра
+# РџРµС‡Р°С‚СЊ int РёР· РїСЂРѕРёР·РІРѕР»СЊРЅРѕРіРѕ СЂРµРіРёСЃС‚СЂР°
 .macro print_int_from_register (%reg)
     mv a0, %reg
     li a7, 1          # print_int
     ecall
 .end_macro
 
-# Ввод int в указанный регистр
+# Р’РІРѕРґ int РІ СѓРєР°Р·Р°РЅРЅС‹Р№ СЂРµРіРёСЃС‚СЂ
 .macro read_int (%reg)
     li a7, 5          # read_int
     ecall
     mv %reg, a0
 .end_macro
 
-# Печать double (значение ожидается в fa0)
+# РџРµС‡Р°С‚СЊ double (Р·РЅР°С‡РµРЅРёРµ РѕР¶РёРґР°РµС‚СЃСЏ РІ fa0)
 .macro print_double_from_fa0
     li a7, 3          # print_double
     ecall
 .end_macro
 
-# Ввод double в fa0
+# Р’РІРѕРґ double РІ fa0
 .macro read_double_to_fa0
     li a7, 7          # read_double
     ecall
 .end_macro
 
-# Копировать произвольный x-регистр в a0
+# РљРѕРїРёСЂРѕРІР°С‚СЊ РїСЂРѕРёР·РІРѕР»СЊРЅС‹Р№ x-СЂРµРіРёСЃС‚СЂ РІ a0
 .macro register_to_a0 (%reg)
     mv a0, %reg
 .end_macro
 
-# Завершение программы
+# Р—Р°РІРµСЂС€РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
 .macro exit
     li a7, 10         # exit
     ecall
 .end_macro
 
-# Обёртка-макрос для вычисления 1/exp(x):
-#   вход:  fa0 = x (double)
-#   выход: fa0 = 1/exp(x)
+# РћР±С‘СЂС‚РєР°-РјР°РєСЂРѕСЃ РґР»СЏ РІС‹С‡РёСЃР»РµРЅРёСЏ 1/exp(x):
+#   РІС…РѕРґ:  fa0 = x (double)
+#   РІС‹С…РѕРґ: fa0 = 1/exp(x)
 .macro invexp_fa0
     call inv_exp
 .end_macro

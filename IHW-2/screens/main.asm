@@ -1,8 +1,8 @@
 # =========================
-# main.asm — пользовательский интерфейс к 1/exp(x) (double)
-# Режимы:
-#   0 — интерактивный ввод x, печать 1/exp(x)
-#   1 — автотесты по фиксированному набору x
+# main.asm вЂ” РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРёР№ РёРЅС‚РµСЂС„РµР№СЃ Рє 1/exp(x) (double)
+# Р РµР¶РёРјС‹:
+#   0 вЂ” РёРЅС‚РµСЂР°РєС‚РёРІРЅС‹Р№ РІРІРѕРґ x, РїРµС‡Р°С‚СЊ 1/exp(x)
+#   1 вЂ” Р°РІС‚РѕС‚РµСЃС‚С‹ РїРѕ С„РёРєСЃРёСЂРѕРІР°РЅРЅРѕРјСѓ РЅР°Р±РѕСЂСѓ x
 # =========================
 
     .include "macros.asm"
@@ -14,7 +14,7 @@ result_s:    .asciz "\nResult 1/exp(x) = "
 warn_s:      .asciz "\n[Note] Very large |x| may overflow/underflow double.\n"
 limit709:    .double 709.0
 
-# Данные для тестового режима (печать списка x и соответствующих 1/exp(x))
+# Р”Р°РЅРЅС‹Рµ РґР»СЏ С‚РµСЃС‚РѕРІРѕРіРѕ СЂРµР¶РёРјР° (РїРµС‡Р°С‚СЊ СЃРїРёСЃРєР° x Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёС… 1/exp(x))
 hdr:    .asciz "Automated tests for inv_exp(x) = 1/exp(x):\n"
 fmt1:   .asciz "x = "
 fmt2:   .asciz "  ->  1/exp(x) = "
@@ -25,22 +25,22 @@ NTEST:  .word 12
     .text
     .globl main
 
-# Точка входа
+# РўРѕС‡РєР° РІС…РѕРґР°
 main:
-    # --- выбор режима ---
+    # --- РІС‹Р±РѕСЂ СЂРµР¶РёРјР° ---
     print_label(mode_prompt)
-    read_int(t0)                  # t0 = 0 или 1
+    read_int(t0)                  # t0 = 0 РёР»Рё 1
     li t1, 1
-    beq t0, t1, run_tests         # 1 ? режим автотестов
+    beq t0, t1, run_tests         # 1 ? СЂРµР¶РёРј Р°РІС‚РѕС‚РµСЃС‚РѕРІ
 
 # =========================
-# РЕЖИМ 0: интерактив
+# Р Р•Р–РРњ 0: РёРЅС‚РµСЂР°РєС‚РёРІ
 # =========================
 interactive:
     print_label(prompt)
     read_double_to_fa0            # fa0 = x (double)
 
-    # Мягкое предупреждение для |x| >= 709 (граница double)
+    # РњСЏРіРєРѕРµ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ РґР»СЏ |x| >= 709 (РіСЂР°РЅРёС†Р° double)
     fneg.d   f1, fa0              # f1 = ?x
     fsgnjx.d f2, f1, f1           # f2 = |x|
     la       t0, limit709
@@ -50,50 +50,50 @@ interactive:
     print_label(warn_s)
 .no_warn:
 
-    # Расчёт: вход fa0=x ? выход fa0=1/exp(x)
+    # Р Р°СЃС‡С‘С‚: РІС…РѕРґ fa0=x ? РІС‹С…РѕРґ fa0=1/exp(x)
         # invexp_fa0
     call inv_exp
 
 
-    # Вывод результата
+    # Р’С‹РІРѕРґ СЂРµР·СѓР»СЊС‚Р°С‚Р°
     print_label(result_s)
     print_double_from_fa0
     newline
     exit
 
 # =========================
-# РЕЖИМ 1: автотесты
+# Р Р•Р–РРњ 1: Р°РІС‚РѕС‚РµСЃС‚С‹
 # =========================
 run_tests:
     print_label(hdr)
 
-    lw t2, NTEST                  # t2 = количество тестов
-    la t3, tests                  # t3 ? массив double
+    lw t2, NTEST                  # t2 = РєРѕР»РёС‡РµСЃС‚РІРѕ С‚РµСЃС‚РѕРІ
+    la t3, tests                  # t3 ? РјР°СЃСЃРёРІ double
 
 .t_loop:
     beqz t2, .t_done
 
-    # Подать x в fa0
+    # РџРѕРґР°С‚СЊ x РІ fa0
     fld fa0, 0(t3)
 
-    # Печать x
+    # РџРµС‡Р°С‚СЊ x
     print_label(fmt1)
     print_double_from_fa0
     newline
 
-    # Расчёт и вывод
+    # Р Р°СЃС‡С‘С‚ Рё РІС‹РІРѕРґ
     call inv_exp
     print_label(fmt2)
     print_double_from_fa0
     newline
     print_label(sep)
 
-    addi t3, t3, 8                # следующий double (8 байт)
+    addi t3, t3, 8                # СЃР»РµРґСѓСЋС‰РёР№ double (8 Р±Р°Р№С‚)
     addi t2, t2, -1
     j .t_loop
 
 .t_done:
     exit
 
-# Подключаем реализацию математических подпрограмм ПОСЛЕ main.
+# РџРѕРґРєР»СЋС‡Р°РµРј СЂРµР°Р»РёР·Р°С†РёСЋ РјР°С‚РµРјР°С‚РёС‡РµСЃРєРёС… РїРѕРґРїСЂРѕРіСЂР°РјРј РџРћРЎР›Р• main.
     .include "math_exp.asm"
